@@ -8,9 +8,9 @@ WPS Office es una suite ofimática con excelente compatibilidad con MS Word. Par
 
 ## Novedades en v0.2.0
 
-**Compatibilidad con Zotero 9**
+**Compatibilidad con Zotero 9+ (probado en Zotero 9.0.x)**
 
-Zotero 9 introdujo nuevas medidas de seguridad que rompían la comunicación con el proxy en Linux:
+Zotero 7 introdujo nuevas medidas de seguridad (estos fixes han sido probados con Zotero 9.0.x en Linux y Windows) que rompían la comunicación con el proxy en Linux:
 
 - Corregido `NetworkError`: el proxy ahora prueba `127.0.0.1` (IPv4) y luego `localhost` (IPv6/`::1`) — en Linux, Zotero 7 puede escuchar únicamente en `::1`.
 - Corregido `400 Bad Request`: el header `Host` ahora se reescribe a `localhost:23119`, requerido por la protección DNS rebinding de Zotero 7.
@@ -47,6 +47,9 @@ python3 install.py
 ```
 
 **Windows**
+
+Ejecuta windows_install.bat como administrador
+
 ```bash
 python install.py
 ```
@@ -135,6 +138,6 @@ GPL-3.0 — ver [LICENSE](LICENSE). Este complemento se distribuye sin ninguna g
 
 **Autor original:** Tang, Kewei — [https://github.com/tankwyn/WPS-Zotero](https://github.com/tankwyn/WPS-Zotero)
 
-**Cambios** por danielhluna - https://github.com/danielhluna/WPS-Zotero
+**Cambiado** por danielhluna - https://github.com/danielhluna/WPS-Zotero
 
 **Colaboradores:** ver [pull requests](../../pulls) e [issues](../../issues).
