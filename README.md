@@ -10,9 +10,9 @@ WPS is an office suite with excellent compatibility with MS Word. For scientific
 
 ## What's new in v0.2.0
 
-**Zotero 9 compatibility fixes**
+**Zotero 7+ compatibility fixes (tested on Zotero 9.0.x)**
 
-Zotero 9 introduced several security measures that broke communication with the proxy on Linux:
+Zotero 7 introduced several security measures (these fixes have been tested with Zotero 9.0.x on Linux and Windows) that broke communication with the proxy on Linux:
 
 - Fixed `NetworkError`: the proxy now tries `127.0.0.1` (IPv4) and then `localhost` (IPv6/`::1`) — on Linux, Zotero 7 may listen only on `::1`.
 - Fixed `400 Bad Request`: the `Host` header is now rewritten to `localhost:23119` as required by Zotero 7's DNS rebinding protection.
@@ -49,6 +49,9 @@ python3 install.py
 ```
 
 **Windows**
+
+run windows_install.bat such as administrator
+
 ```bash
 python install.py
 ```
