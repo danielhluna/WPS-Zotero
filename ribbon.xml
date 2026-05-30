@@ -1,16 +1,22 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="OnAddinLoad">
     <ribbon startFromScratch="false">
         <tabs>
-            <tab id="zoteroTab" label="Zotero" keytip="C">
-                <group id="zoteroGroup" label="Zotero">
-                    <button id="btnAddEditCitation" label="Add/Edit Citation" onAction="OnAction" getImage="GetImage" visible="true" size="large" supertip="Insert a new citation, or edit the citation at the current cursor position" keytip="C"/>
-                    <button id="btnAddEditBib" label="Add/Edit Refs" onAction="OnAction" getImage="GetImage" visible="true" size="large" supertip="Insert a new bibliography, or edit the existing bibliography, at the current cursor position" keytip="B"/>
-                    <button id="btnRefresh" label="Refresh" onAction="OnAction" getImage="GetImage" visible="true" size="large" supertip="Update all citations to reflect changes" keytip="R"/>
-                    <button id="btnPref" label="Preferences" onAction="OnAction" getImage="GetImage" visible="true" supertip="Change the citation style or locale" keytip="P"/>
-                    <button id="btnAddNote" label="Add Note" onAction="OnAction" getImage="GetImage" visible="true" supertip="Insert a new note at the current cursor position" keytip="N"/>
-                    <button id="btnUnlink" label="Unlink" onAction="OnAction" getImage="GetImage" visible="true" supertip="Remove all Zotero field codes and unlink from Zotero library" keytip="U"/>
-                    <button id="btnExport" label="Export" onAction="OnAction" getImage="GetImage" visible="true" supertip="Export the document to switch to another word processor" keytip="E"/>
-                    <button id="btnAbout" label="About" onAction="OnAction" getImage="GetImage" visible="true" size="large" supertip="About this add-on" keytip="A"/>
+            <tab id="zoteroTab" getLabel="GetLabel" keytip="C">
+                <group id="zoteroGroup" getLabel="GetLabel">
+                    <button id="btnAddEditCitation" getLabel="GetLabel" onAction="OnAction" getImage="GetImage" getSupertip="GetSupertip" visible="true" size="large" keytip="C"/>
+                    <button id="btnAddEditBib"      getLabel="GetLabel" onAction="OnAction" getImage="GetImage" getSupertip="GetSupertip" visible="true" size="large" keytip="B"/>
+                    <button id="btnRefresh"         getLabel="GetLabel" onAction="OnAction" getImage="GetImage" getSupertip="GetSupertip" visible="true" size="large" keytip="R"/>
+                    <button id="btnPref"            getLabel="GetLabel" onAction="OnAction" getImage="GetImage" getSupertip="GetSupertip" visible="true"             keytip="P"/>
+                    <button id="btnAddNote"         getLabel="GetLabel" onAction="OnAction" getImage="GetImage" getSupertip="GetSupertip" visible="true"             keytip="N"/>
+                    <button id="btnUnlink"          getLabel="GetLabel" onAction="OnAction" getImage="GetImage" getSupertip="GetSupertip" visible="true"             keytip="U"/>
+                    <button id="btnExport"          getLabel="GetLabel" onAction="OnAction" getImage="GetImage" getSupertip="GetSupertip" visible="true"             keytip="E"/>
+                    <button id="btnAbout"           getLabel="GetLabel" onAction="OnAction" getImage="GetImage" getSupertip="GetSupertip" visible="true" size="large" keytip="A"/>
+                    <!-- Menú desplegable de idioma -->
+                    <menu id="menuLang" getLabel="GetLabel" getImage="GetImage" getSupertip="GetSupertip" visible="true" keytip="L">
+                        <button id="btnLangEn" label="English"  onAction="OnAction" getImage="GetImageLang" visible="true"/>
+                        <button id="btnLangEs" label="Español"  onAction="OnAction" getImage="GetImageLang" visible="true"/>
+                        <button id="btnLangZh" label="中文"      onAction="OnAction" getImage="GetImageLang" visible="true"/>
+                    </menu>
                 </group>
             </tab>
         </tabs>

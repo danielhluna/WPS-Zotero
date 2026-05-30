@@ -17,17 +17,14 @@ function zc_createClient(documentId, processor) {
     function requestStatusHint(status) {
         if (status >= 300) {
             if (status < 400) {
-                zc_alert(`Received unexpected redirection message ${status}!`);
-            }
-            else if (status < 500) {
-                zc_alert(`Client error ${status}`);
-            }
-            else {
+                zc_alert(`${t('err_redirect')} ${status}!`);
+            } else if (status < 500) {
+                zc_alert(`${t('err_client')} ${status}`);
+            } else {
                 if (status === 503) {
-                    zc_alert('Zotero is serving another program, restart it if this is not the case.');
-                }
-                else {
-                    zc_alert(`Server error ${status}`);
+                    zc_alert(t('err_zotero_busy'));
+                } else {
+                    zc_alert(`${t('err_server')} ${status}`);
                 }
             }
         }
@@ -37,7 +34,7 @@ function zc_createClient(documentId, processor) {
         return postRequestXHR(commandUrl, {
             "command": command,
             "docId": documentId,
-        })
+        });
     }
 
     function respond(payload) {
@@ -48,39 +45,33 @@ function zc_createClient(documentId, processor) {
      * Send command to Zotero and make changes to documents.
     **/
     function transact(command) {
-        // Init transaction
         let state = true;
         processor.init(documentId);
 
         let flag = false;
         try {
-            // Make request
             let req = execCommand(command);
             assert(req);
             flag = true;
             if (req.status < 300) {
-                // Keep responding until the transaction is fullfilled
                 while (req && req.status < 300) {
                     req = autoRespond(req);
                 }
-            }
-            else {
+            } else {
                 state = false;
                 if (req) {
                     console.error(`Unexpected response from Zotero: status = ${req.status}, msg = ${req.payload}`);
                     requestStatusHint(req.status);
                 }
             }
-        }
-        catch (error) {
+        } catch (error) {
             state = false;
             console.error('Error occurred:', error);
-            const guide = flag ? '\nYou will have to restart Zotero.' : '';
+            const guide = flag ? t('err_network_restart') : '';
             if (error.name === 'NetworkError') {
-                zc_alert('Network error occurred, is Zotero running?' + guide);
-            }
-            else {
-                zc_alert(`Error occurred ${error.name}, please click dev tool, navigate to console and report the issue.` + guide);
+                zc_alert(t('err_network') + guide);
+            } else {
+                zc_alert(t('err_generic', error.name) + guide);
             }
         }
 
@@ -98,7 +89,7 @@ function zc_createClient(documentId, processor) {
                 "supportsImportExport": true,
                 "supportsTextInsertion": true,
                 "supportsCitationMerging": true,
-                "processorName":"Google Docs"
+                "processorName": "Google Docs"
             });
         },
 
@@ -120,7 +111,6 @@ function zc_createClient(documentId, processor) {
         canInsertField: function(args) {
             const docId = args[0];
             assert(docId === documentId);
-            // TODO: Other cases a field cannot be inserted?
             return respond(!processor.isInLink(documentId));
         },
 
@@ -138,16 +128,12 @@ function zc_createClient(documentId, processor) {
 
         getDocumentData: function(args) {
             const defaultDocDataV3 = '<data data-version="3"/>';
-            // const defaultDocDataV4 = JSON.stringify("{\"dataVersion\": 4}");
             const docId = args[0];
             assert(docId === documentId);
             let dataStr = processor.getDocData(docId);
-            // IMPORTANT: Change bibliographyStyleHasBeenSet to false to always get a setBibliographyStyle command.
             dataStr = dataStr.replaceAll('bibliographyStyleHasBeenSet="1"', 'bibliographyStyleHasBeenSet="0"');
             dataStr = dataStr.replaceAll('\\"bibliographyStyleHasBeenSet\\": true', '\\"bibliographyStyleHasBeenSet\\": false');
             dataStr = dataStr.replaceAll('\\"bibliographyStyleHasBeenSet\\":true', '\\"bibliographyStyleHasBeenSet\\":false');
-            // Compatible with MS word integration.
-            // default to data version 3
             dataStr = dataStr ? dataStr : defaultDocDataV3;
             return respond(dataStr);
         },
@@ -192,14 +178,12 @@ function zc_createClient(documentId, processor) {
             const fieldIds = args[1];
             const toFieldType = args[2];
             const toNoteType = args[3];
-            // Count is undefined
             assert(docId === documentId);
             assert(toFieldType === 'Http');
             processor.convertToNoteType(docId, fieldIds, toNoteType);
             return respond(null);
         },
 
-        // Convert the placeholders in notes to citation fields.
         convertPlaceholdersToFields: function(args) {
             const docId = args[0];
             const placeholderIds = args[1];
@@ -215,7 +199,7 @@ function zc_createClient(documentId, processor) {
             const firstLineIndent = args[1];
             const indent = args[2];
             const lineSpacing = args[3];
-            const entrySpacing = args[4]
+            const entrySpacing = args[4];
             const tabStops = args[5];
             const tabStopsCount = args[6];
             assert(docId === documentId);
@@ -225,8 +209,6 @@ function zc_createClient(documentId, processor) {
 
         complete: function(args) {
             delete args;
-            // const docId = args[0];
-            // assert(docId === documentId);
         },
 
         delete: function(args) {
@@ -280,13 +262,12 @@ function zc_createClient(documentId, processor) {
 
         exportDocument: function(args) {
             const docId = args[0];
-            // args[1] == Http
             const msg = args[2];
             processor.exportDocument(docId);
             alert(msg);
             return respond(null);
         }
-    }
+    };
 
     /**
      * Respond to word processor commands
@@ -296,7 +277,7 @@ function zc_createClient(documentId, processor) {
         const payload = req.payload;
         const method = payload.command.split('.')[1];
         const args = Array.from(payload.arguments);
-        if (args.length > 0) { 
+        if (args.length > 0) {
             var docID = args[0];
             assert(docID === documentId);
         }
@@ -311,5 +292,3 @@ function zc_createClient(documentId, processor) {
         import: () => { processor.importDocument(documentId); }
     };
 }
-
-    

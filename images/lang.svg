@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 800 800"
+   version="1.1"
+   width="800"
+   height="800"
+   xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style type="text/css">
+      .skinbaseDark { fill-rule:evenodd; opacity:0.8; }
+      .skinbaseLight { fill-rule:evenodd; opacity:0.8; fill:#838383; }
+    </style>
+  </defs>
+
+  <!-- Marco exterior — mismo estilo rojo que el resto de íconos -->
+  <path
+     class="skinbaseDark"
+     style="fill:#800000; stroke-width:28;"
+     d="M 670.949,717.597 H 137.622 A 56.14,56.14 0 0 1 81.483,661.457 V 128.130
+        A 56.14,56.14 0 0 1 137.622,71.990 h 533.327 a 56.14,56.14 0 0 1 56.14,56.140
+        V 661.457 A 56.14,56.14 0 0 1 670.949,717.597 Z
+        M 699.019,128.130 A 28.07,28.07 0 0 0 670.949,100.060 H 137.622
+        a 28.07,28.07 0 0 0 -28.07,28.070 v 533.327 a 28.07,28.07 0 0 0 28.07,28.070
+        h 533.327 a 28.07,28.07 0 0 0 28.07,-28.070 Z" />
+
+  <!-- Globo terráqueo — círculo base -->
+  <circle
+     cx="400" cy="390" r="210"
+     style="fill:none; stroke:#5599ff; stroke-width:38;" />
+
+  <!-- Meridianos verticales -->
+  <ellipse
+     cx="400" cy="390" rx="105" ry="210"
+     style="fill:none; stroke:#5599ff; stroke-width:28;" />
+
+  <!-- Líneas de latitud -->
+  <line x1="195" y1="310" x2="605" y2="310"
+        style="stroke:#5599ff; stroke-width:28;" />
+  <line x1="195" y1="470" x2="605" y2="470"
+        style="stroke:#5599ff; stroke-width:28;" />
+
+  <!-- Línea ecuatorial -->
+  <line x1="190" y1="390" x2="610" y2="390"
+        style="stroke:#5599ff; stroke-width:28;" />
+
+  <!-- Letras E·S·中 superpuestas en la parte superior — indicador de idioma -->
+  <text
+     x="400" y="215"
+     text-anchor="middle"
+     style="font-family:sans-serif; font-size:115px; font-weight:bold;
+            fill:#ffffff; stroke:none;">E·文</text>
+</svg>

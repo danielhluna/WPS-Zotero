@@ -17,53 +17,70 @@ function zc_alert(msg) {
     alert(`WPS-Zotero: ${msg}`);
 }
 
-// Storing global variables
 const GLOBAL_MAP = {};
 
 /**
+ * Refresca las etiquetas del ribbon según el idioma activo.
+ */
+function refreshRibbonLabels() {
+    if (!wps.ribbonUI) return;
+    const ids = [
+        'zoteroTab', 'zoteroGroup',
+        'btnAddEditCitation', 'btnAddEditBib', 'btnRefresh',
+        'btnPref', 'btnAddNote', 'btnUnlink', 'btnExport',
+        'btnAbout', 'menuLang',
+        'btnLangEn', 'btnLangEs', 'btnLangZh'
+    ];
+    ids.forEach(id => {
+        try { wps.ribbonUI.InvalidateControl(id); } catch(e) {}
+    });
+}
+
+/**
  * Callback for plugin loading.
-**/
+ */
 function OnAddinLoad(ribbonUI) {
     if (typeof (wps.Enum) !== "object") {
         wps.Enum = WPS_Enum;
-        zc_alert('You are using an old version of WPS, this plugin might not work properly!');
+        zc_alert(t('err_old_wps'));
     }
-    if (typeof (wps.ribbonUI) !== "object"){
+    if (typeof (wps.ribbonUI) !== "object") {
         wps.ribbonUI = ribbonUI;
     }
 
     GLOBAL_MAP.isWin = Boolean(wps.Env.GetProgramDataPath());
     GLOBAL_MAP.osSep = GLOBAL_MAP.isWin ? '\\' : '/';
     GLOBAL_MAP.instDir = GLOBAL_MAP.isWin ?
-        wps.Env.GetAppDataPath().replaceAll('/', '\\') + `\\kingsoft\\wps\\jsaddons\\wps-zotero_${VERSION}`:
+        wps.Env.GetAppDataPath().replaceAll('/', '\\') + `\\kingsoft\\wps\\jsaddons\\wps-zotero_${VERSION}` :
         wps.Env.GetHomePath() + `/.local/share/Kingsoft/wps/jsaddons/wps-zotero_${VERSION}`;
     GLOBAL_MAP.proxyPath = GLOBAL_MAP.instDir + GLOBAL_MAP.osSep + 'proxy.py';
 
-    // Start http proxy server
+    // Recargar idioma desde disco ahora que instDir está disponible
+    i18n.reload();
+    refreshRibbonLabels();
+
+    // Iniciar proxy
     if (GLOBAL_MAP.isWin) {
         wps.OAAssist.ShellExecute('pythonw.exe', GLOBAL_MAP.proxyPath);
-    }
-    else {
+    } else {
         wps.OAAssist.ShellExecute('python3', GLOBAL_MAP.proxyPath);
     }
-    
-    // Exit the proxy server when the application quits.
+
     Application.ApiEvent.AddApiEventListener("ApplicationQuit", () => {
         postRequestXHR('http://127.0.0.1:21931/stopproxy', null);
     });
-    
+
     return true;
 }
 
 /**
  * Callback for button clicking events.
-**/
+ */
 function OnAction(control) {
-    const eleId = control.Id
+    const eleId = control.Id;
     switch (eleId) {
         case "btnAddEditCitation":
             zc_bind().command('addEditCitation');
-            // IMPORTANT: Release references on the document objects!!!
             zc_clearRegistry();
             break;
         case "btnAddEditBib":
@@ -72,7 +89,6 @@ function OnAction(control) {
             break;
         case "btnRefresh":
             zc_bind().import();
-            // Must open a new client, since import will not register fields to zc_bind().
             zc_bind().command('refresh');
             zc_clearRegistry();
             break;
@@ -81,9 +97,8 @@ function OnAction(control) {
             zc_clearRegistry();
             break;
         case "btnExport":
-            if (confirm('Convert this document to a format for other word processors to import from? You may want to make a backup first.'))
-            {
-               zc_bind().export();
+            if (confirm(t('dlg_export_confirm'))) {
+                zc_bind().export();
             }
             break;
         case "btnUnlink":
@@ -95,33 +110,100 @@ function OnAction(control) {
             zc_clearRegistry();
             break;
         case "btnAbout":
-            alert(`WPS-Zotero (${VERSION})\n\nThis add-on is licensed under GPL-3.0: <http://www.gnu.org/licenses/>, it comes with no warranty.\n\nAuthor: Tang, Kewei\nhttps://github.com/tankwyn/WPS-Zotero`);
+            alert(t('dlg_about', VERSION));
+            break;
+        // Opciones del menú de idioma — selección directa, sin diálogos
+        case "btnLangEn":
+            applyLang('en');
+            break;
+        case "btnLangEs":
+            applyLang('es');
+            break;
+        case "btnLangZh":
+            applyLang('zh');
+            break;
         default:
             break;
     }
     return true;
 }
 
-function GetImage(control) {
-    const eleId = control.Id
-    switch (eleId) {
-        case "btnAddEditCitation":
-            return "images/addEditCitation.svg";
-        case "btnAddEditBib":
-            return "images/addEditBib.svg";
-        case "btnRefresh":
-            return "images/refresh.svg";
-        case "btnPref":
-            return "images/pref.svg";
-        case "btnAddNote":
-            return "images/addNote.svg";
-        case "btnUnlink":
-            return "images/unlink.svg";
-        case "btnExport":
-            return "images/export.svg";
-        default:
-            break;
-    }
-    return "images/default.svg";
+/**
+ * Aplica el idioma seleccionado, refresca el ribbon y avisa al usuario.
+ */
+function applyLang(lang) {
+    i18n.setLang(lang);
+    refreshRibbonLabels();
+    alert(t('dlg_lang_changed', i18n.langNames[lang]));
 }
 
+/**
+ * Devuelve la etiqueta localizada de cada control del ribbon.
+ */
+function GetLabel(control) {
+    const map = {
+        zoteroTab:          t('tab_label'),
+        zoteroGroup:        t('group_label'),
+        btnAddEditCitation: t('btn_addEditCitation'),
+        btnAddEditBib:      t('btn_addEditBib'),
+        btnRefresh:         t('btn_refresh'),
+        btnPref:            t('btn_pref'),
+        btnAddNote:         t('btn_addNote'),
+        btnUnlink:          t('btn_unlink'),
+        btnExport:          t('btn_export'),
+        btnAbout:           t('btn_about'),
+        menuLang:           t('btn_lang'),
+    };
+    return map[control.Id] ?? control.Id;
+}
+
+/**
+ * Devuelve el supertip localizado de cada botón.
+ */
+function GetSupertip(control) {
+    const map = {
+        btnAddEditCitation: t('tip_addEditCitation'),
+        btnAddEditBib:      t('tip_addEditBib'),
+        btnRefresh:         t('tip_refresh'),
+        btnPref:            t('tip_pref'),
+        btnAddNote:         t('tip_addNote'),
+        btnUnlink:          t('tip_unlink'),
+        btnExport:          t('tip_export'),
+        btnAbout:           t('tip_about'),
+        menuLang:           t('tip_lang'),
+    };
+    return map[control.Id] ?? '';
+}
+
+/**
+ * Imágenes para los botones principales.
+ */
+function GetImage(control) {
+    const map = {
+        btnAddEditCitation: "images/addEditCitation.svg",
+        btnAddEditBib:      "images/addEditBib.svg",
+        btnRefresh:         "images/refresh.svg",
+        btnPref:            "images/pref.svg",
+        btnAddNote:         "images/addNote.svg",
+        btnUnlink:          "images/unlink.svg",
+        btnExport:          "images/export.svg",
+        btnAbout:           "images/default.svg",
+        menuLang:           "images/lang.svg",
+    };
+    return map[control.Id] ?? "images/default.svg";
+}
+
+/**
+ * Imágenes para los items del menú de idioma.
+ * Muestra una marca de verificación en el idioma activo.
+ */
+function GetImageLang(control) {
+    const activeLang = i18n.getLang();
+    const langMap = {
+        btnLangEn: 'en',
+        btnLangEs: 'es',
+        btnLangZh: 'zh',
+    };
+    const isActive = langMap[control.Id] === activeLang;
+    return isActive ? "images/lang_check.svg" : "images/lang_dot.svg";
+}
